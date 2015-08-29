@@ -1,0 +1,24 @@
+{
+  "name": "gokart-timer",
+  "version": "1.0.0",
+  "description": "Lap timer for go karting based on the raspberry pi",
+  "main": "index.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dspinoz/gokart-timer.git"
+  },
+  "author": "Daniel Spinozzi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dspinoz/gokart-timer/issues"
+  },
+  "homepage": "https://github.com/dspinoz/gokart-timer#readme",
+  "dependencies": {
+    "nmea": "0.0.9",
+    "serialport": "^1.7.4"
+  }
+}
