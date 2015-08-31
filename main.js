@@ -1,17 +1,10 @@
-var spawn = require('child_process').spawn,
-    gps   = spawn('node', ['app/gps.js']);
+var child_process = require('child_process');
 
-gps.stdout.on('data', function (data) {
-  console.log('GPS', data.toString('ascii'));
+var gps = child_process.fork(__dirname + '/app/gps.js');
+
+gps.on('message', function(m) {
+  console.log('GPS:', m);
 });
-
-gps.stderr.on('data', function (data) {
-  console.log('GPS: ERROR' + data);
-});
-
-gps.on('close', function (code) {
-});
-
 
 process.on('SIGINT', function() {
   process.exit(0);
