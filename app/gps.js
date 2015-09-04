@@ -1,5 +1,8 @@
 var serialport = require('serialport');
 var nmea = require('nmea');
+var d3 = require('d3');
+
+var timeFormat = d3.time.format('%y%m%d%H%M%S.%L');
 
 var port = new serialport.SerialPort('/dev/ttyAMA0', {
                 baudrate: 57600,
@@ -24,7 +27,7 @@ port.on('data', function(line) {
       var lat = gps.lat/100 * (gps.latPole == 'S' ? -1 : 1);
       var lon = gps.lon/100 * (gps.lonPole == 'W' ? -1 : 1);
       
-      d.time = gps.timestamp;
+      d.gps_time = gps.timestamp;
       d.lat = lat;
       d.lon = lon;
       d.satellites = gps.numSat;
@@ -36,11 +39,12 @@ port.on('data', function(line) {
       d.track = gps.trackTrue;
     }
     else if (gps.type == 'nav-info') {
-      d.date = gps.date;
+      d.gps_date = gps.date;
     }
 
-    if (d['date'] && d['speed'] &&
-        d['time']) {
+    if (d['gps_date'] && d['speed'] &&
+        d['gps_time']) {
+      d.time = timeFormat.parse(d.gps_date + d.gps_time);
       process.send(d);
       d = {};
     }

@@ -3,7 +3,7 @@ var child_process = require('child_process');
 var gps = child_process.fork(__dirname + '/app/gps.js');
 
 gps.on('message', function(m) {
-  console.log('GPS:', m);
+  console.log('GPS:', new Date(), m);
 });
 
 process.on('SIGINT', function() {
