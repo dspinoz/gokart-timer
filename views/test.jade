@@ -1,0 +1,15 @@
+extends container
+block append head
+  script(type='text/javascript', src='/js/test.js')
+
+block container
+
+  h1 Getting Started
+  
+block append body-end
+  script(type='text/javascript').
+    console.log('testing...');
+    d3.select('#main-content')
+    .append('div')
+    .attr('id', 'd3')
+    .html('<span class="glyphicon glyphicon-ok" style="color:green">d3</span>');

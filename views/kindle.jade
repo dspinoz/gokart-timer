@@ -1,0 +1,52 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    //- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags 
+    meta(name="description" content="")
+    meta(name="author" content="")
+    link(rel="icon" href="../../favicon.ico")
+
+    title Sticky Footer Template for Bootstrap
+
+    //- Bootstrap core CSS
+    link(type='text/css', rel='stylesheet', href='/bootstrap.css')
+    
+    //- queue
+    script(type='text/javascript', src='/queue.js')
+    
+    //- d3
+    script(type='text/javascript', src='/d3.js')
+    script(type='text/javascript', src='/d3kit.js')
+    
+    //- fonts/icons
+    link(type='text/css', rel='stylesheet', href='/font-awesome.css')
+    link(type='text/css', rel='stylesheet', href='/weather-icons.css')
+
+    //- my style
+    link(type='text/css', rel='stylesheet', href='/css/kindle.css')
+      
+  body
+
+    //- Begin page content
+    .container-fluid
+      .row
+        .col-xs-6
+          #time
+        .col-xs-6
+          #date
+          #day 
+          
+      .row
+        .col-xs-6
+          #forecast
+        .col-xs-6
+          #month-view
+
+    footer.footer
+      .container
+        p.text-muted#footer
+        
+    script(type='text/javascript', src='/js/kindle.js')

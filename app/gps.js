@@ -8,8 +8,11 @@ var port = new serialport.SerialPort('/dev/ttyAMA0', {
                 baudrate: 57600,
                 parser: serialport.parsers.readline('\r\n')});
 
-var d = {},
+var started = false,
+    d = {},
     count = 0;
+
+console.log('GPS starting...');
 
 port.on('data', function(line) {
     var gps = null;
@@ -19,6 +22,11 @@ port.on('data', function(line) {
     catch (err) {
       console.error(err);
       return;
+    }
+
+    if (!started) {
+      console.log('GPS ok!');
+      started = true;
     }
 
     //console.log('gps', gps);
@@ -48,4 +56,8 @@ port.on('data', function(line) {
       process.send(d);
       d = {};
     }
+});
+
+process.on('exit', function(code) {
+  console.log("GPS shut down");
 });
