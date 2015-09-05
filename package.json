@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/dspinoz/gokart-timer#readme",
   "dependencies": {
+    "bson": "^0.4.11",
     "d3": "^3.5.6",
     "nmea": "0.0.9",
     "serialport": "^1.7.4"
