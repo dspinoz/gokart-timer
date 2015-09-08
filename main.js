@@ -11,6 +11,8 @@ console.log(config.title, 'starting...');
 var gps = child_process.fork(__dirname + '/app/gps.js');
 var web = child_process.fork(__dirname + '/app/web.js');
 
+var children = [gps, web];
+
 var data = [];
 
 gps.on('message', function(m) {
@@ -33,6 +35,9 @@ gps.on('message', function(m) {
 gps.on('error', function(err) {
   console.log('GPS ERROR', err);
 });
+gps.on('exit', function() {
+  children.pop();
+});
 
 
 web.on('message', function(m) {
@@ -41,10 +46,21 @@ web.on('message', function(m) {
 web.on('error', function(err) {
   console.log('WEB ERROR', err);
 });
+web.on('exit', function() {
+  children.pop();
+});
 
 
 process.on('SIGINT', function() {
-  process.exit(0);
+  children.forEach(function(p) {
+    p.kill('SIGINT');
+  });
+  var i = setInterval(function() {
+    if (children.length == 0) {
+      clearInterval(i);
+      process.exit(0);
+    }
+  }, 100);
 });
 
 process.on('exit', function(code) {

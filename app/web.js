@@ -25,7 +25,7 @@ console.log("Web starting...");
 exports = module.exports = app;
 
 app.listen(config.port, function() { // startup our app at http://localhost:port
-  console.log("Web listening on " + config.port + "...");
+  console.log("Web ok! Listening on " + config.port + "...");
 });
 
 process.on('SIGINT', function() {

@@ -58,6 +58,10 @@ port.on('data', function(line) {
     }
 });
 
+process.on('SIGINT', function() {
+  process.exit(0);
+});
+
 process.on('exit', function(code) {
   console.log("GPS shut down");
 });
