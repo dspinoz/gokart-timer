@@ -53,7 +53,7 @@ wsServer.on('request', function(request) {
     }
     
     var connection = request.accept('echo-protocol', request.origin);
-    console.log('Connection from', request.origin, 'accepted.');
+    console.log('Connection from', connection.remoteAddress, 'accepted (origin ' + request.origin + ').');
 
     connection.send(JSON.stringify({message: 'hello'}));
 

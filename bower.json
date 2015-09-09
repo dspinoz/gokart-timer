@@ -1,0 +1,29 @@
+{
+  "name": "gokart-timer",
+  "version": "0.0.0",
+  "homepage": "https://github.com/dspinoz/gokart-timer",
+  "authors": [
+    "Daniel <dspinoz@gmail.com>"
+  ],
+  "description": "GoKart timer for use with raspberry pi",
+  "main": "main.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "raspberrypi",
+    "nodejs"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.6",
+    "d3kit": "~1.0.6"
+  }
+}
