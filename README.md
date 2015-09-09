@@ -24,4 +24,5 @@ This is an auto lap-timer for go karting, based on the raspberry pi!
 * git clone https://github.com/dspinoz/gokart-timer
 * apt-get install build-essential screen
 * npm install
+* node_modules/bower/bin/bower install
 * npm start
