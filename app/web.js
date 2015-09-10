@@ -44,6 +44,8 @@ function originIsAllowed(origin) {
   return true;
 }
 
+var clients = [];
+
 wsServer.on('request', function(request) {
     if (!originIsAllowed(request.origin)) {
       // Make sure we only accept requests from an allowed origin 
@@ -53,6 +55,7 @@ wsServer.on('request', function(request) {
     }
     
     var connection = request.accept('echo-protocol', request.origin);
+    clients.push(connection);
     console.log('Connection from', connection.remoteAddress, 'accepted (origin ' + request.origin + ').');
 
     connection.send(JSON.stringify({message: 'hello'}));
@@ -72,6 +75,12 @@ wsServer.on('request', function(request) {
     connection.on('close', function(reasonCode, description) {
       console.log('Connection', connection.remoteAddress, 'disconnected.');
     });
+});
+
+process.on('message', function(m) {
+  clients.forEach(function(c) {
+    c.send(JSON.stringify(m));
+  });
 });
 
 process.on('SIGINT', function() {
