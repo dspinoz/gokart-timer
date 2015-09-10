@@ -13,27 +13,26 @@ var p = d3.geo.mercator()
 
 var conn = new WebSocket(document.URL.replace('http','ws'), "echo-protocol");
 
-d3.select('#console').append('div').text('woopa');
-d3.select('#console').append('div').text('starting ' + JSON.stringify(conn));
-
 conn.onopen = function() {
-  console.log('connected');
-  d3.select('#console').append('div').text('connected');
+  d3.select('#status').attr('class', 'fa fa-check').style('color', 'green').text(null);
 };
 
 conn.onerror = function(err) {
-  console.log('connection error', err);
-  d3.select('#console').append('div').text('error: ' + err);
+  d3.select('#status').attr('class', 'fa fa-exclamation-triangle').style('color', 'red').text(null);
+  console.log('Connection error:', err);
+  d3.select('#console').text('Connection error:', JSON.stringify(err));
 };
 
 conn.onmessage = function(msg) {
   var data = JSON.parse(msg.data);
 
   if (data['gps_set']){
-    d3.select('#console').append('div').text('message: ' + JSON.stringify(data));
+    d3.select('#status').attr('class', 'fa fa-spinner fa-pulse').text(null);
 
     var c = svg.selectAll('circle').data(data.gps_set);
     
+    c.exit().remove();
+
     c.enter().append('circle');
 
     c.attr('transform', function(d) {
@@ -48,22 +47,15 @@ conn.onmessage = function(msg) {
       })
       .attr('r', 5);
 
-    
     var last = data.gps_set[data.gps_set.length-1];
-    console.log('last', last);
     d3.select('#time').text(last.gps.time);
     d3.select('#speed').text(last.gps.speed);
     d3.select('#satellites').text(last.gps.satellites);
     d3.select('#track').text(last.gps.track);
-
-
-
   }
-
 };
 
 conn.onclose = function() {
-  console.log('disconnected');
-  d3.select('#console').append('div').text('disconnected');
+  d3.select('#status').attr('class', 'fa fa-close').text(null);
 };
 

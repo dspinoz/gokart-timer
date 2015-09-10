@@ -1,23 +1,22 @@
 extends container
 block append head
-  style(src='/css/index.css')
+  link(href='/css/index.css',rel='stylesheet')
 
 block container
 
   h1 GoKart Timer
-  #time
-  #speed
-  #satellites
-  #track
+    small#status
+  i.fa.fa-clock-o
+    span#time
+  i.fa.fa-forward
+    span#speed
+  i.fa.fa-share-alt
+    span#satellites
+  i.fa.fa-location-arrow
+    span#track
   #gps
+  
   #console
   
 block append body-end
-  script(type='text/javascript').
-    console.log('testing...');
-    d3.select('#main-content')
-    .append('div')
-    .attr('id', 'd3')
-    .html('<span class="glyphicon glyphicon-ok" style="color:green">d3</span>');
-
   script(type='text/javascript', src='/js/index.js')
