@@ -13,22 +13,29 @@ var web = child_process.fork(__dirname + '/app/web.js');
 
 var children = [gps, web];
 
-var data = [];
+var cache = [];
+var wcache = [];
 
 gps.on('message', function(m) {
 //  console.log('GPS:', new Date(), m);
-  data.push(m);
+  cache.push(m);
+  wcache.push({gps: m});
 
-  if (data.length > 1000) {
+  if (wcache.length > 5){
+    web.send({gps_set: wcache});
+    wcache=[];
+  }
+
+  if (cache.length > 1000) {
     var i = 0;
     var fn = 'gps-'+i+'.out';
     while(fs.existsSync(fn)) {
       i++;
       fn = 'gps-'+i+'.out';
     }
-    fs.writeFile(fn, JSON.stringify(data));
-//    fs.writeFile(fn, BSON.serialize(data, false, true, false));
-    data = [];
+    fs.writeFile(fn, JSON.stringify(cache));
+//    fs.writeFile(fn, BSON.serialize(cache, false, true, false));
+    cache = [];
   }
 });
 
