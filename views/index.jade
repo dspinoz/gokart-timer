@@ -1,11 +1,15 @@
 extends container
-//block append head
-//  script(type='text/javascript', src='/js/index.js')
+block append head
+  style(src='/css/index.css')
 
 block container
 
-  h1 Getting Started
-
+  h1 GoKart Timer
+  #time
+  #speed
+  #satellites
+  #track
+  #gps
   #console
   
 block append body-end
