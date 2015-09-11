@@ -2,7 +2,7 @@ var serialport = require('serialport');
 var nmea = require('nmea');
 var d3 = require('d3');
 
-var timeFormat = d3.time.format('%y%m%d%H%M%S.%L');
+var timeFormat = d3.time.format('%d%m%y%H%M%S.%L');
 
 var port = new serialport.SerialPort('/dev/ttyAMA0', {
                 baudrate: 57600,
