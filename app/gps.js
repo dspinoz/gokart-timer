@@ -53,7 +53,12 @@ port.on('data', function(line) {
     if (d['gps_date'] && d['speed'] &&
         d['gps_time']) {
       d.time = timeFormat.parse(d.gps_date + d.gps_time);
-      process.send(d);
+      if (process.send) {
+        process.send(d);
+      }
+      else {
+        console.log(d);
+      } 
       d = {};
     }
 });
