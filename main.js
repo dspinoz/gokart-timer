@@ -10,8 +10,9 @@ console.log(config.title, 'starting...');
 
 var gps = child_process.fork(__dirname + '/app/gps.js');
 var web = child_process.fork(__dirname + '/app/web.js');
+var gpio = child_process.fork(__dirname + '/app/gpio.js');
 
-var children = [gps, web];
+var children = [gps, web, gpio];
 
 var cache = [];
 var wcache = [];
@@ -59,6 +60,16 @@ web.on('error', function(err) {
   console.log('WEB ERROR', err);
 });
 web.on('exit', function() {
+  children.pop();
+});
+
+
+gpio.on('message', function(m) {
+});
+gpio.on('error', function(err) {
+  console.log('GPIO ERROR', err);
+});
+gpio.on('exit', function() {
   children.pop();
 });
 
