@@ -26,3 +26,10 @@ This is an auto lap-timer for go karting, based on the raspberry pi!
 * npm install
 * node_modules/bower/bin/bower install
 * npm start
+
+### System Setup
+* Auto load on startup
+** crontab -e
+
+  @reboot cd <installdir>; /usr/local/bin/node main.js 2>&1 | tee cron.log
+
