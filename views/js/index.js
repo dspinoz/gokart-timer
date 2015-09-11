@@ -23,13 +23,33 @@ conn.onerror = function(err) {
   d3.select('#console').text('Connection error:', JSON.stringify(err));
 };
 
+var cache = [];
+
 conn.onmessage = function(msg) {
   var data = JSON.parse(msg.data);
 
   if (data['gps_set']){
     d3.select('#status').attr('class', 'fa fa-spinner fa-pulse').text(null);
 
-    var c = svg.selectAll('circle').data(data.gps_set);
+    data.gps_set.forEach(function(d) {
+      cache.push(d);
+    });
+    while (cache.length > 100) {
+      cache.shift();
+    }
+
+    if (cache.length == 0)
+      d3.select('#cache').attr('class', 'fa fa-battery-empty').text(cache.length);
+    if (cache.length > 24)
+      d3.select('#cache').attr('class', 'fa fa-battery-1').text(cache.length);
+    if (cache.length > 49)
+      d3.select('#cache').attr('class', 'fa fa-battery-2').text(cache.length);;
+    if (cache.length > 74)
+      d3.select('#cache').attr('class', 'fa fa-battery-3').text(cache.length);
+    if (cache.length >= 100)
+      d3.select('#cache').attr('class', 'fa fa-battery-4').text(cache.length);
+
+    var c = svg.selectAll('circle').data(cache);
     
     c.exit().remove();
 
