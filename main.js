@@ -16,6 +16,18 @@ var children = [gps, web];
 var cache = [];
 var wcache = [];
 
+function write_cache() {
+  var i = 0;
+  var fn = 'gps-'+i+'.out';
+  while(fs.existsSync(fn)) {
+    i++;
+    fn = 'gps-'+i+'.out';
+  }
+  console.log("Writing GPS to", fn);
+  fs.writeFile(fn, JSON.stringify(cache));
+//  fs.writeFile(fn, BSON.serialize(cache, false, true, false));
+}
+
 gps.on('message', function(m) {
 //  console.log('GPS:', new Date(), m);
   cache.push(m);
@@ -27,14 +39,7 @@ gps.on('message', function(m) {
   }
 
   if (cache.length > 1000) {
-    var i = 0;
-    var fn = 'gps-'+i+'.out';
-    while(fs.existsSync(fn)) {
-      i++;
-      fn = 'gps-'+i+'.out';
-    }
-    fs.writeFile(fn, JSON.stringify(cache));
-//    fs.writeFile(fn, BSON.serialize(cache, false, true, false));
+    write_cache();
     cache = [];
   }
 });
@@ -59,6 +64,7 @@ web.on('exit', function() {
 
 
 process.on('SIGINT', function() {
+  write_cache();
   children.forEach(function(p) {
     p.kill('SIGINT');
   });
