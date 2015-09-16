@@ -3,9 +3,22 @@ var w = 600, h = 600;
 var svg = d3.select('#gps').append('svg').attr('width', w).attr('height', h);
            
 var p = d3.geo.mercator()
-  .scale(9000000)
+  .scale(90000)
   .center([138, -34])
   .translate([w * 0.5, h * 0.5]);
+
+var grat = d3.geo.graticule().minorStep([0.2,0.2]);
+var grat_path = d3.geo.path().projection(p);
+svg.append('path')
+  .datum(grat)
+  .attr('class', 'graticule')
+  .style({
+    fill: 'none',
+    stroke: '#777',
+    'stroke-opacity': '0.5',
+    'stroke-width': '0.5px'
+  })
+  .attr('d', grat_path);
 
 var conn = new WebSocket(document.URL.replace('http','ws'), "echo-protocol");
 
@@ -46,14 +59,17 @@ conn.onmessage = function(msg) {
       if (history_count <= 0) {
         gps_history.push({lat: d.gps.lat, lon: d.gps.lon});
         history_count = history_inc;
-        d3.select('#minmax').text(gps_history.length);
       }
       
     });
+    while (gps_history.length > 500) {
+      gps_history.shift();
+    }
     while (cache.length > 100) {
       cache.shift();
     }
 
+    d3.select('#history').text(gps_history.length);
     if (cache.length == 0)
       d3.select('#cache').attr('class', 'fa fa-battery-empty').text(cache.length);
     if (cache.length > 24)
@@ -84,15 +100,19 @@ conn.onmessage = function(msg) {
     c.enter().append('circle').attr('class', 'history');
     
     c.attr('r', 1)
-      .style('fill-opacity', 0.3)
+      .style('fill-opacity', 0.2)
       .attr('transform', function(d) {
         return 'translate('+p([d.lon,d.lat])+')';
+      })
+      .on('mouseover', function() {
+        console.log(d3.select(this).attr('transform'));
       });
 
     d3.select('#time').text(last.gps.time);
     d3.select('#speed').text(last.gps.speed);
     d3.select('#satellites').text(last.gps.satellites);
     d3.select('#track').text(last.gps.track);
+    d3.select('#hdop').text(last.gps.hdop);
   }
 };
 
