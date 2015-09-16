@@ -1,15 +1,11 @@
 
-var w = 600, h = 400;
+var w = 600, h = 600;
 var svg = d3.select('#gps').append('svg').attr('width', w).attr('height', h);
-
-var c = {"lat":-34.490547,"lon":138.378078999};
-            
+           
 var p = d3.geo.mercator()
-  //.scale((w + 1) / 2 / Math.PI)
-  .scale(100000)
-  .translate([w / 2, h / 2])
-  .precision(.1)
-  .center([c.lon, c.lat]);
+  .scale(9000000)
+  .center([138, -34])
+  .translate([w * 0.5, h * 0.5]);
 
 var conn = new WebSocket(document.URL.replace('http','ws'), "echo-protocol");
 
@@ -24,15 +20,35 @@ conn.onerror = function(err) {
 };
 
 var cache = [];
+var gps_history = [];
+var history_inc = 1;
+var history_count = history_inc;
 
 conn.onmessage = function(msg) {
   var data = JSON.parse(msg.data);
 
   if (data['gps_set']){
     d3.select('#status').attr('class', 'fa fa-spinner fa-pulse').text(null);
+    
+    var last = data.gps_set[data.gps_set.length-1];
+    
+    // re-center when point moves off the viewbox
+    var pos = p([last.gps.lon, last.gps.lat]);
+    if (pos[0] > w || pos[1] > h || pos[0] < 0 || pos[1] < 0) {
+      p.center([last.gps.lon, last.gps.lat]);
+    }
+    
 
     data.gps_set.forEach(function(d) {
       cache.push(d);
+      
+      history_count--;
+      if (history_count <= 0) {
+        gps_history.push({lat: d.gps.lat, lon: d.gps.lon});
+        history_count = history_inc;
+        d3.select('#minmax').text(gps_history.length);
+      }
+      
     });
     while (cache.length > 100) {
       cache.shift();
@@ -49,25 +65,30 @@ conn.onmessage = function(msg) {
     if (cache.length >= 100)
       d3.select('#cache').attr('class', 'fa fa-battery-4').text(cache.length);
 
-    var c = svg.selectAll('circle').data(cache);
+    var now = svg.selectAll('circle.now').data([last]);
     
+    now.exit().remove();
+
+    now.enter().append('circle').attr('class', 'now');
+
+    now.attr('r', 2)
+      .style('stroke', 'red')
+      .style('fill', 'none')
+      .attr('transform', function(d) {
+        return 'translate('+p([d.gps.lon,d.gps.lat])+')';
+      });
+        
+        
+    var c = svg.selectAll('circle.history').data(gps_history);
     c.exit().remove();
+    c.enter().append('circle').attr('class', 'history');
+    
+    c.attr('r', 1)
+      .style('fill-opacity', 0.3)
+      .attr('transform', function(d) {
+        return 'translate('+p([d.lon,d.lat])+')';
+      });
 
-    c.enter().append('circle');
-
-    c.attr('transform', function(d) {
-      return 'translate('+p([d.gps.lon,d.gps.lat])+')';
-    })
-    c.attr('r', 0)
-    c.style('fill', 'red')
-    c.style('fill-opacity', 0.2)
-    .transition()
-      .duration(function(d,i) {
-        return i * 100;
-      })
-      .attr('r', 5);
-
-    var last = data.gps_set[data.gps_set.length-1];
     d3.select('#time').text(last.gps.time);
     d3.select('#speed').text(last.gps.speed);
     d3.select('#satellites').text(last.gps.satellites);
