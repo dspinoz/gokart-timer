@@ -4,6 +4,7 @@ var cli = require('commander');
 cli.version('0.0.1')
   .option('-f, --input <path>', 'input file with saved gps data')
   .option('-d, --delay <ms>', 'sleep time between gps points', 200) //5 Hz
+  .option('--no-repeat', 'disable repeating outputs', false)
   .parse(process.argv);
 
 if (!cli.input) {
@@ -47,9 +48,14 @@ if (b && b.length) {
   var sender = setInterval(function() {
   
     if (!write(json.shift())) {
-      clearInterval(sender);
+      if (cli.noRepeat) {
+        clearInterval(sender);
+      }
+      else{
+        console.log('Replaying gps points...');
+        json = JSON.parse(b.toString());
+      }
     }
-    
   }, cli.delay);
 }
 else {
