@@ -28,6 +28,7 @@
     "onoff": "^1.0.2",
     "request": "~2.25.0",
     "serialport": "^1.7.4",
-    "websocket": "~1.0.8"
+    "websocket": "~1.0.8",
+    "xmldoc": "^0.3.1"
   }
 }
