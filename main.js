@@ -45,10 +45,10 @@ function write_cache() {
   }
 
   var i = 0;
-  var fn = 'gps-'+i+'.out';
+  var fn = config.file.prefix + '-'+i+'.out';
   while(fs.existsSync(fn)) {
     i++;
-    fn = 'gps-'+i+'.out';
+    fn = config.file.prefix +'-'+i+'.out';
   }
   console.log("Writing GPS to", fn);
   fs.writeFile(fn, JSON.stringify(cache));
@@ -65,7 +65,7 @@ gps.on('message', function(m) {
     wcache=[];
   }
 
-  if (cache.length > 1000) {
+  if (cache.length > 100) {
     write_cache();
     cache = [];
   }

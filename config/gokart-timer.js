@@ -6,6 +6,7 @@ module.exports = {
   gpio: {
     led: 22,
     button: 23
-  }
+  },
+  file: { prefix: 'gpstest' }
   
 }
