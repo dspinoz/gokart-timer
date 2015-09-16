@@ -1,16 +1,37 @@
 var child_process = require('child_process');
 var fs = require('fs');
 var bson = require("bson");
+var cli = require('commander');
 
 var config = require('./config/gokart-timer');
-
 var BSON = new bson.BSONPure.BSON();
+var cmd = {};
+
+cli.version('0.0.1');
+
+cli.command('sim')
+  .description('simulation mode. Use to test GPS/GPIO modules with an input file')
+  .option('--gps <file>', 'specify gps input filename', 'all.out')
+  .option('--gps-delay <ms>', 'delay between gps points', 200)
+  .action(function(opt) {
+    cmd.sim = { gps: {file: opt.gps, delay: opt.gpsDelay} };
+  });
+
+cli.parse(process.argv);
 
 console.log(config.title, 'starting...');
 
-var gps = child_process.fork(__dirname + '/app/gps.js');
 var web = child_process.fork(__dirname + '/app/web.js');
-var gpio = child_process.fork(__dirname + '/app/gpio.js');
+var gps,gpio;
+
+if (cmd.sim) {
+  gps = child_process.fork(__dirname + '/app/gps_sim.js', ['-f', cmd.sim.gps.file, '-d', cmd.sim.gps.delay]);
+  gpio = child_process.fork(__dirname + '/app/gpio_sim.js');
+}
+else {
+  gps = child_process.fork(__dirname + '/app/gps.js');
+  gpio = child_process.fork(__dirname + '/app/gpio.js');
+}
 
 var children = [gps, web, gpio];
 
@@ -18,6 +39,11 @@ var cache = [];
 var wcache = [];
 
 function write_cache() {
+
+  if (cmd.sim) {
+    return true;
+  }
+
   var i = 0;
   var fn = 'gps-'+i+'.out';
   while(fs.existsSync(fn)) {
