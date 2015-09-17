@@ -3,23 +3,34 @@ var w = 600, h = 600;
 var svg = d3.select('#gps').append('svg').attr('width', w).attr('height', h);
            
 var p = d3.geo.mercator()
-  .scale(990000)
+  .scale(5000)
   .center([138, -34])
   .translate([w * 0.5, h * 0.5]);
+  
 
 var grat = d3.geo.graticule().minorStep([0.2,0.2]);
 var grat_path = d3.geo.path().projection(p);
-svg.append('path')
-  .datum(grat)
-  .attr('class', 'graticule')
-  .style({
+svg.append('path').attr('class', 'graticule').style({
     fill: 'none',
     stroke: '#777',
-    'stroke-opacity': '0.5',
+    'stroke-opacity': '0.05',
     'stroke-width': '0.5px'
-  })
+  });
+
+svg.select('path.graticule')
+  .datum(grat)
   .attr('d', grat_path);
 
+d3.select("#zoom").on("input", function() {
+  d3.select('#zoomvalue').text(this.value);
+  p.scale(+this.value);
+  // repainting graticule is very heavy on CPU
+});
+
+d3.select('#zoomvalue').text(d3.select("#zoom").attr('value'));
+p.scale(d3.select("#zoom").attr('value'));
+  
+  
 var conn = new WebSocket(document.URL.replace('http','ws'), "echo-protocol");
 
 conn.onopen = function() {
@@ -34,7 +45,7 @@ conn.onerror = function(err) {
 
 var cache = [];
 var gps_history = [];
-var history_inc = 1;
+var history_inc = 100;
 var history_count = history_inc;
 
 var hp = {min: -1, max:-1}, vp = {min:-1, max:-1};
