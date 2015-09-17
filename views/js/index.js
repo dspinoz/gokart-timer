@@ -3,7 +3,7 @@ var w = 600, h = 600;
 var svg = d3.select('#gps').append('svg').attr('width', w).attr('height', h);
            
 var p = d3.geo.mercator()
-  .scale(90000)
+  .scale(990000)
   .center([138, -34])
   .translate([w * 0.5, h * 0.5]);
 
@@ -37,6 +37,9 @@ var gps_history = [];
 var history_inc = 1;
 var history_count = history_inc;
 
+var hp = {min: -1, max:-1}, vp = {min:-1, max:-1};
+var distanceh = 0, distancev = 0;
+    
 conn.onmessage = function(msg) {
   var data = JSON.parse(msg.data);
 
@@ -107,6 +110,33 @@ conn.onmessage = function(msg) {
       .on('mouseover', function() {
         console.log(d3.select(this).attr('transform'));
       });
+      
+    gps_history.forEach(function(d) {
+      if (hp.min == -1 || hp.max==-1) {
+        hp.min = d.lon;
+        hp.max = d.lon;
+      }
+      
+      if (d.lon < hp.min) {
+        hp.min = d.lon;
+      }
+      else if (d.lon > hp.max) {
+        hp.max = d.lon;
+      }
+      
+      if (vp.min == -1 || vp.max == -1) {
+        vp.min = d.lat;
+        vp.max = d.lat;
+      }
+      if (d.lat < vp.min) {
+        vp.min = d.lat;
+      }
+      else if (d.lat > vp.max) {
+        vp.max = d.lat;
+      }
+      
+    });
+    d3.select('#distance').text((d3.geo.distance([hp.min, vp.min],[hp.max, vp.max])*6378100).toFixed(3) + 'm');
 
     d3.select('#time').text(last.gps.time);
     d3.select('#speed').text(last.gps.speed);
