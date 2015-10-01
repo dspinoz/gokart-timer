@@ -45,27 +45,37 @@ function write_cache() {
   }
 
   var i = 0;
-  var fn = config.file.prefix + '-'+i+'.out';
+  var fn = config.output.prefix + '-'+i+'.'+config.output.type;
   while(fs.existsSync(fn)) {
     i++;
-    fn = config.file.prefix +'-'+i+'.out';
+    fn = config.output.prefix +'-'+i+'.'+config.output.type;
   }
+  
   console.log("Writing GPS to", fn);
-  fs.writeFile(fn, JSON.stringify(cache));
-//  fs.writeFile(fn, BSON.serialize(cache, false, true, false));
+  
+  if (config.output.type == 'bson') {
+    fs.writeFile(fn, BSON.serialize(cache, false, true, false));
+  }
+  else if (config.output.type == 'json') {
+    fs.writeFile(fn, JSON.stringify(cache));
+  }
+  else {
+    console.log('ERROR', 'Invalid output type', config.output.type);
+    process.kill(process.pid, 'SIGINT');
+  }
 }
 
 gps.on('message', function(m) {
-//  console.log('GPS:', new Date(), m);
+  //console.log('GPS:', new Date(), m);
   cache.push(m);
   wcache.push({gps: m});
 
-  if (wcache.length > 5){
+  if (wcache.length > config.web.buffer){
     web.send({gps_set: wcache});
     wcache=[];
   }
 
-  if (cache.length > 100) {
+  if (cache.length > config.gps.buffer) {
     write_cache();
     cache = [];
   }

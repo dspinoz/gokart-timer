@@ -7,6 +7,15 @@ module.exports = {
     led: 22,
     button: 23
   },
-  file: { prefix: 'gpstest' }
+  web: {
+    buffer: 5
+  },
+  gps: {
+    buffer: 100
+  },
+  output: { 
+    type: 'json', // json or bson
+    prefix: 'gpstest' 
+  }
   
 }
