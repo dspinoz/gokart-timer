@@ -1,8 +1,10 @@
-var WebSocketServer = require('websocket').server;
 var http = require('http');
 var express = require('express');
+var socketio = require('socket.io');
+
 var app     = express();
 var server  = http.createServer(app);
+var io      = socketio(server);
 
 var config = require('../config/gokart-timer');
 var routes = require('./gokart-timer');
@@ -30,57 +32,12 @@ server.listen(config.port, function() { // startup our app at http://localhost:p
   console.log("Web ok! Listening on " + config.port + "...");
 });
 
-wsServer = new WebSocketServer({
-    httpServer: server,
-    // You should not use autoAcceptConnections for production 
-    // applications, as it defeats all standard cross-origin protection 
-    // facilities built into the protocol and the browser.  You should 
-    // *always* verify the connection's origin and decide whether or not 
-    // to accept it. 
-    autoAcceptConnections: false
-});
-
-function originIsAllowed(origin) {
-  return true;
-}
-
-var clients = [];
-
-wsServer.on('request', function(request) {
-    if (!originIsAllowed(request.origin)) {
-      // Make sure we only accept requests from an allowed origin 
-      request.reject();
-      console.log('Connection from', request.origin, 'rejected!');
-      return;
-    }
-    
-    var connection = request.accept('echo-protocol', request.origin);
-    clients.push(connection);
-    console.log('Connection from', connection.remoteAddress, 'accepted (origin ' + request.origin + ').');
-
-    connection.send(JSON.stringify({message: 'hello'}));
-
-    connection.on('message', function(message) {
-      if (message.type === 'utf8') {
-        console.log('Received Message from', connection.remoteAddress, ':', message.utf8Data);
-
-        var js = JSON.parse(message.utf8Data);
-        connection.sendUTF(JSON.stringify({message: js.txt}));
-      }
-      else if (message.type === 'binary') {
-        console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-        connection.sendBytes(message.binaryData);
-      }
-    });
-    connection.on('close', function(reasonCode, description) {
-      console.log('Connection', connection.remoteAddress, 'disconnected.');
-    });
+io.on('connection', function(client) {
+	console.log('Client connected via websocket: ', client.conn.id);
 });
 
 process.on('message', function(m) {
-  clients.forEach(function(c) {
-    c.send(JSON.stringify(m));
-  });
+  io.emit('gps_set', JSON.stringify(m));
 });
 
 process.on('SIGINT', function() {
